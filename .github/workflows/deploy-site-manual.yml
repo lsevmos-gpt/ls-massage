@@ -1,0 +1,215 @@
+name: Deploy massage to REG.RU (manual, guarded)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "plan = read-only simulation; deploy = backup and publish"
+        required: true
+        type: choice
+        options:
+          - plan
+          - deploy
+        default: plan
+      confirm_domain:
+        description: "For deploy type massage.liniyasporta.ru exactly"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: massage-liniyasporta-production
+  cancel-in-progress: false
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout website sources
+        uses: actions/checkout@v4
+
+      - name: Enforce protected manual deployment
+        env:
+          MODE: ${{ inputs.mode }}
+          CONFIRM_DOMAIN: ${{ inputs.confirm_domain }}
+          REPO_PRIVATE: ${{ github.event.repository.private }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$MODE" in
+            plan)
+              echo "Planning only. No writes will be performed."
+              ;;
+            deploy)
+              if [ "$REPO_PRIVATE" != "true" ]; then
+                echo "::error::This repo is PUBLIC. Restore Private visibility before backing up or publishing the site."
+                exit 1
+              fi
+              if [ "$CONFIRM_DOMAIN" != "massage.liniyasporta.ru" ]; then
+                echo "::error::Type massage.liniyasporta.ru into confirm_domain to authorize deployment."
+                exit 1
+              fi
+              ;;
+            *)
+              echo "::error::Invalid mode. Choose plan or deploy."
+              exit 1
+              ;;
+          esac
+
+      - name: Validate required v11 website files
+        shell: bash
+        run: |
+          set -euo pipefail
+          required_files=(
+            site/index.html
+            site/styles.css
+            site/app.js
+            site/content.json
+            site/clubs/geroev-stalingrada/index.html
+            site/clubs/olympia/index.html
+            site/specialists/anna/index.html
+            site/specialists/grigory/index.html
+            site/specialists/svetlana/index.html
+            site/assets/LS_LOGO_VERTICAL_GREEN_WHITE_MASTER.png
+            site/assets/LS_LOGO_HORIZONTAL_GREEN_WHITE_TRANSPARENT_MASTER.png
+            site/assets/anna-original-portrait.png
+            site/assets/grigory-card-centered-v9.png
+            site/assets/svetlana-card.png
+          )
+          for file in "${required_files[@]}"; do
+            if [ ! -s "$file" ]; then
+              echo "::error file=$file::Missing/empty required site file. Import the COMPLETE approved v11 sources first."
+              exit 1
+            fi
+          done
+          python3 -m json.tool site/content.json >/dev/null
+          echo "Required website files exist; content.json parses."
+
+      - name: Verify GitHub secret
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$MASSAGE_REG_PASSWORD" ]; then
+            echo "::error::Secret MASSAGE_REG_PASSWORD is missing in THIS repository."
+            exit 1
+          fi
+
+      - name: Install FTPS tool
+        shell: bash
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Verify domain marker in dedicated FTP root (read-only)
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            get .massage-site-root.txt -o /tmp/massage-site-root.txt;
+            bye
+          "
+          if [ "$(tr -d '\r\n' < /tmp/massage-site-root.txt)" != "massage.liniyasporta.ru" ]; then
+            echo "::error::Wrong FTP root marker. Refusing to deploy."
+            exit 1
+          fi
+          echo "Dedicated FTP root marker matches massage.liniyasporta.ru."
+
+      - name: Show remote upload plan (no writes)
+        if: inputs.mode == 'plan'
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            mirror -R --dry-run --verbose --no-perms --exclude-glob '*.md' site/ ./;
+            bye
+          "
+          echo "Dry run only; no hosting files have been changed."
+
+      - name: Back up existing dedicated FTP root
+        if: inputs.mode == 'deploy'
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _hosting_backup
+          lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            mirror --verbose --no-perms ./ _hosting_backup/;
+            bye
+          "
+
+      - name: Save backup artifact before upload
+        if: inputs.mode == 'deploy'
+        uses: actions/upload-artifact@v4
+        with:
+          name: massage-reg-backup-${{ github.run_id }}
+          path: _hosting_backup/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Publish site by explicit FTPS without deleting server files
+        if: inputs.mode == 'deploy'
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            mirror -R --verbose --no-perms --exclude-glob '*.md' site/ ./;
+            bye
+          "
+
+      - name: Verify six production pages over HTTPS
+        if: inputs.mode == 'deploy'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for route in             /             /clubs/geroev-stalingrada/             /clubs/olympia/             /specialists/anna/             /specialists/grigory/             /specialists/svetlana/
+          do
+            url="https://massage.liniyasporta.ru${route}?verify=${GITHUB_SHA}"
+            curl --fail --location --silent --show-error               --retry 3 --retry-delay 5 --connect-timeout 10 --max-time 40               "$url" -o /tmp/massage-verified.html
+            grep -Eqi 'Линия спорта|ЛИНИЯ СПОРТА|Массаж' /tmp/massage-verified.html
+            echo "Verified $route"
+          done
+          echo "Six HTTPS pages responded successfully."
