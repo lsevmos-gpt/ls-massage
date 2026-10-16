@@ -36,19 +36,19 @@ jobs:
         env:
           MODE: ${{ inputs.mode }}
           CONFIRM_DOMAIN: ${{ inputs.confirm_domain }}
-          REPO_PRIVATE: ${{ github.event.repository.private }}
+          REPO_NAME: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
+          if [ "$REPO_NAME" != "lsevmos-gpt/ls-massage" ]; then
+            echo "::error::Workflow is only approved for the massage repository."
+            exit 1
+          fi
           case "$MODE" in
             plan)
               echo "Planning only. No writes will be performed."
               ;;
             deploy)
-              if [ "$REPO_PRIVATE" != "true" ]; then
-                echo "::error::This repo is PUBLIC. Restore Private visibility before backing up or publishing the site."
-                exit 1
-              fi
               if [ "$CONFIRM_DOMAIN" != "massage.liniyasporta.ru" ]; then
                 echo "::error::Type massage.liniyasporta.ru into confirm_domain to authorize deployment."
                 exit 1
@@ -166,7 +166,7 @@ jobs:
             set net:max-retries 2;
             set net:timeout 20;
             cd /;
-            mirror --verbose --no-perms ./ _hosting_backup/;
+            mirror --verbose --no-perms --exclude-glob '.*' --exclude-glob '*.php' --exclude-glob '*.sql' --exclude-glob '*.env' --exclude-glob '*.ini' --exclude-glob '*.log' --exclude-glob '*.pem' --exclude-glob '*.key' --exclude-glob '*config*' --exclude-glob '*.zip' --exclude-glob '*.tar' ./ _hosting_backup/;
             bye
           "
 
@@ -176,7 +176,7 @@ jobs:
         with:
           name: massage-reg-backup-${{ github.run_id }}
           path: _hosting_backup/
-          include-hidden-files: true
+          include-hidden-files: false
           if-no-files-found: warn
           retention-days: 7
 
