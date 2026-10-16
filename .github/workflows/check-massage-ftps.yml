@@ -1,0 +1,80 @@
+name: Check massage FTPS (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: massage-ftps-readonly
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Confirm FTP password secret is present
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$MASSAGE_REG_PASSWORD" ]; then
+            echo "::error::Secret MASSAGE_REG_PASSWORD is absent in THIS repository."
+            exit 1
+          fi
+          echo "Repository FTPS password secret is present."
+
+      - name: Install FTPS client
+        shell: bash
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Verify explicit FTPS login and directory access (no writes)
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            pwd;
+            bye
+          "
+          echo "FTPS authentication and read-only directory check passed."
+
+      - name: Check optional domain safety marker (read-only)
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            get .massage-site-root.txt -o /tmp/massage-site-root.txt;
+            bye
+          "; then
+            if [ "$(tr -d '\r\n' < /tmp/massage-site-root.txt)" = "massage.liniyasporta.ru" ]; then
+              echo "FTP root contains the expected massage site marker."
+            else
+              echo "::warning::FTP root marker has unexpected contents. Do not deploy."
+            fi
+          else
+            echo "::notice::FTP works, but the root marker is missing. Create .massage-site-root.txt in the site webroot before plan/deploy."
+          fi
