@@ -1,0 +1,4 @@
+Authorized production deployment of validated massage v11 website to massage.liniyasporta.ru.
+FTP credentials: configured in GitHub Actions secret.
+Prerequisites: domain binding verified, six site pages and image assets imported, read-only plan passed.
+No delete remote files. Back up public web files before upload.
