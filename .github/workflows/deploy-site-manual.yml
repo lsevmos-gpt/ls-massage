@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'site/**'
+      - '.github/trigger-massage-publish.txt'
   workflow_dispatch:
     inputs:
       mode:
@@ -39,8 +40,8 @@ jobs:
 
       - name: Enforce protected manual deployment
         env:
-          MODE: ${{ inputs.mode || 'plan' }}
-          CONFIRM_DOMAIN: ${{ inputs.confirm_domain }}
+          MODE: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') && 'deploy' || inputs.mode || 'plan' }}
+          CONFIRM_DOMAIN: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') && 'massage.liniyasporta.ru' || inputs.confirm_domain }}
           REPO_NAME: ${{ github.repository }}
         shell: bash
         run: |
@@ -134,7 +135,7 @@ jobs:
           echo "Dedicated FTP root marker matches massage.liniyasporta.ru."
 
       - name: Show remote upload plan (no writes)
-        if: github.event_name == 'push' || inputs.mode == 'plan'
+        if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[publish-massage]') || inputs.mode == 'plan'
         env:
           MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
         shell: bash
@@ -155,7 +156,7 @@ jobs:
           echo "Dry run only; no hosting files have been changed."
 
       - name: Back up existing dedicated FTP root
-        if: inputs.mode == 'deploy'
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') || inputs.mode == 'deploy'
         env:
           MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
         shell: bash
@@ -176,7 +177,7 @@ jobs:
           "
 
       - name: Save backup artifact before upload
-        if: inputs.mode == 'deploy'
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') || inputs.mode == 'deploy'
         uses: actions/upload-artifact@v4
         with:
           name: massage-reg-backup-${{ github.run_id }}
@@ -186,7 +187,7 @@ jobs:
           retention-days: 7
 
       - name: Publish site by explicit FTPS without deleting server files
-        if: inputs.mode == 'deploy'
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') || inputs.mode == 'deploy'
         env:
           MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
         shell: bash
@@ -206,7 +207,7 @@ jobs:
           "
 
       - name: Verify six production pages over HTTPS
-        if: inputs.mode == 'deploy'
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') || inputs.mode == 'deploy'
         shell: bash
         run: |
           set -euo pipefail
