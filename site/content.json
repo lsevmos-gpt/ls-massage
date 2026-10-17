@@ -1,0 +1,150 @@
+{
+  "schema_version": "11",
+  "site": {
+    "domain": "massage.liniyasporta.ru",
+    "title": "Массаж «Линии спорта» — два клуба в Симферополе",
+    "default_language": "ru",
+    "public_indexing_approved": false,
+    "note": "HTML pages are pre-rendered. Keep page templates in sync with this editorial data."
+  },
+  "clubs": [
+    {
+      "id": "geroev-stalingrada",
+      "slug": "geroev-stalingrada",
+      "name": "Линия спорта — Героев Сталинграда",
+      "address": "г. Симферополь, ул. Героев Сталинграда, 6Д",
+      "page": "/clubs/geroev-stalingrada/",
+      "specialist_slugs": [
+        "anna",
+        "grigory",
+        "svetlana"
+      ]
+    },
+    {
+      "id": "olympia",
+      "slug": "olympia",
+      "name": "Линия спорта — ТЦ «Олимпия»",
+      "address": "г. Симферополь, ул. 1-й Конной Армии, 25А",
+      "page": "/clubs/olympia/",
+      "specialist_slugs": [],
+      "note": "Специалисты, цены и контакты пока не предоставлены."
+    }
+  ],
+  "team": [
+    {
+      "slug": "anna",
+      "name": "Анна",
+      "club_id": "geroev-stalingrada",
+      "page": "/specialists/anna/",
+      "phone": "+79781309114",
+      "prices_are_per_html": true,
+      "prices": [
+        {
+          "service": "Ручной массаж, 60 минут, женщина",
+          "regular_rub": 2500,
+          "club_rub": 2000
+        },
+        {
+          "service": "Ручной массаж, 60 минут, мужчина",
+          "regular_rub": 3500,
+          "club_rub": 3000
+        },
+        {
+          "service": "Ручной массаж, 90 минут, женщина",
+          "regular_rub": 3500,
+          "club_rub": 2700
+        },
+        {
+          "service": "Ручной массаж, 90 минут, мужчина",
+          "regular_rub": 4500,
+          "club_rub": 3700
+        },
+        {
+          "service": "Банки",
+          "regular_rub": 700,
+          "club_rub": 500
+        },
+        {
+          "service": "Вибромассаж + LPG",
+          "regular_rub": 2500,
+          "club_rub": 2000
+        },
+        {
+          "service": "Вибромассаж, 30 минут, женщина",
+          "regular_rub": 1300,
+          "club_rub": 1000
+        },
+        {
+          "service": "Вибромассаж, 30 минут, мужчина",
+          "regular_rub": 1800,
+          "club_rub": 1500
+        },
+        {
+          "service": "Вибромассаж, 60 минут, женщина",
+          "regular_rub": 1800,
+          "club_rub": 1500
+        },
+        {
+          "service": "Вибромассаж, 60 минут, мужчина",
+          "regular_rub": 2800,
+          "club_rub": 2500
+        },
+        {
+          "service": "LPG, 30 минут",
+          "regular_rub": 1300,
+          "club_rub": 1000
+        },
+        {
+          "service": "LPG, 60 минут",
+          "regular_rub": 1800,
+          "club_rub": 1500
+        },
+        {
+          "service": "Горячий вакуум, 30 минут",
+          "regular_rub": 1300,
+          "club_rub": 1000
+        },
+        {
+          "service": "Обёртывание",
+          "regular_rub": 500,
+          "club_rub": 300
+        },
+        {
+          "service": "Абонемент, 6 сеансов",
+          "regular_rub": 15000,
+          "club_rub": 10000
+        },
+        {
+          "service": "Абонемент, 12 сеансов",
+          "regular_rub": 25000,
+          "club_rub": 20000
+        }
+      ],
+      "promotion_note": "При покупке абонемента костюм в подарок."
+    },
+    {
+      "slug": "grigory",
+      "name": "Григорий",
+      "club_id": "geroev-stalingrada",
+      "page": "/specialists/grigory/",
+      "phone": "+79787732353",
+      "prices_are_per_html": true
+    },
+    {
+      "slug": "svetlana",
+      "name": "Светлана Щетинина",
+      "club_id": "geroev-stalingrada",
+      "page": "/specialists/svetlana/",
+      "phone": "+79787308212",
+      "availability": "Только воскресенье",
+      "prices_are_per_html": true
+    }
+  ],
+  "excluded_services": [
+    "LPG + кавитация",
+    "LPG + горячий вакуум",
+    "LPG + RF-лифтинг"
+  ],
+  "source": "Google Drive → Массажисты → 03_Сайт → 14_Два_клуба_v11_17-10-2026",
+  "synced_at": "2026-10-17"
+}
