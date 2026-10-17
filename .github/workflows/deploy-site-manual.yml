@@ -1,6 +1,11 @@
 name: Deploy massage to REG.RU (manual, guarded)
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'site/**'
   workflow_dispatch:
     inputs:
       mode:
@@ -34,7 +39,7 @@ jobs:
 
       - name: Enforce protected manual deployment
         env:
-          MODE: ${{ inputs.mode }}
+          MODE: ${{ inputs.mode || 'plan' }}
           CONFIRM_DOMAIN: ${{ inputs.confirm_domain }}
           REPO_NAME: ${{ github.repository }}
         shell: bash
@@ -129,7 +134,7 @@ jobs:
           echo "Dedicated FTP root marker matches massage.liniyasporta.ru."
 
       - name: Show remote upload plan (no writes)
-        if: inputs.mode == 'plan'
+        if: github.event_name == 'push' || inputs.mode == 'plan'
         env:
           MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
         shell: bash
