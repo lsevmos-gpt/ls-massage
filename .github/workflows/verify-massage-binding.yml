@@ -1,0 +1,181 @@
+name: Verify massage domain binding (automatic safe probe)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/verify-massage-binding.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: massage-ftp-binding-test
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Install FTPS client
+        shell: bash
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Resolve domain and server IP addresses
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVER_IP="$(getent ahostsv4 server169.hosting.reg.ru | awk 'NR==1 {print $1}' || true)"
+          DOMAIN_IP="$(getent ahostsv4 massage.liniyasporta.ru | awk 'NR==1 {print $1}' || true)"
+          if [ -z "$SERVER_IP" ]; then
+            echo "::error::Cannot resolve server169.hosting.reg.ru."
+            exit 1
+          fi
+          echo "SERVER_IP=$SERVER_IP" >> "$GITHUB_ENV"
+          echo "TARGET_DOMAIN_IP=$DOMAIN_IP" >> "$GITHUB_ENV"
+          echo "Hosting server IP: $SERVER_IP"
+          if [ -z "$DOMAIN_IP" ]; then
+            echo "::warning::massage.liniyasporta.ru does not resolve publicly yet. Check its DNS A record."
+          else
+            echo "Domain IP: $DOMAIN_IP"
+            if [ "$DOMAIN_IP" != "$SERVER_IP" ]; then
+              echo "::warning::Domain A record differs from the FTP server address. This may be intentional if a proxy or another web server is used."
+            fi
+          fi
+
+      - name: Prepare single-use public verification file
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROBE_FILE="massage-binding-check-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.txt"
+          echo "PROBE_FILE=$PROBE_FILE" >> "$GITHUB_ENV"
+          printf "massage-binding-%s-%s\n" "$GITHUB_RUN_ID" "$GITHUB_SHA" > "$RUNNER_TEMP/$PROBE_FILE"
+          echo "Prepared temporary public verification file."
+
+      - name: Upload harmless verification file to dedicated FTP root
+        id: upload_probe
+        shell: bash
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$MASSAGE_REG_PASSWORD"
+          lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            put $RUNNER_TEMP/$PROBE_FILE -o $PROBE_FILE;
+            bye
+          "
+          echo "Temporary verification file uploaded."
+
+      - name: Prove FTP root serves massage.liniyasporta.ru
+        shell: bash
+        run: |
+          set -euo pipefail
+          MATCH=""
+          for attempt in 1 2 3; do
+            for SCHEME in https http; do
+              # --resolve routes this hostname to the known server even if public DNS
+              # is not configured; -k here checks content identity, NOT TLS validity.
+              if [ "$SCHEME" = https ]; then PORT=443; else PORT=80; fi
+              if curl -kfsSL --connect-timeout 8 --max-time 25                 --resolve "massage.liniyasporta.ru:80:$SERVER_IP"                 --resolve "massage.liniyasporta.ru:443:$SERVER_IP"                 "$SCHEME://massage.liniyasporta.ru/$PROBE_FILE"                 -o "$RUNNER_TEMP/massage-probe-downloaded"; then
+                if cmp -s "$RUNNER_TEMP/$PROBE_FILE" "$RUNNER_TEMP/massage-probe-downloaded"; then
+                  MATCH="$SCHEME"
+                  break
+                fi
+              fi
+            done
+            [ -n "$MATCH" ] && break
+            sleep 3
+          done
+          if [ -z "$MATCH" ]; then
+            echo "::error::Uploaded FTPS file is NOT accessible under massage.liniyasporta.ru on the expected REG.RU server. Check the ISPmanager web-root/FTP-root mapping. No site deploy allowed."
+            exit 1
+          fi
+          echo "Confirmed: FTP root belongs to massage.liniyasporta.ru (served over $MATCH)."
+          echo "Verified via --resolve; public DNS and HTTPS validity are checked separately."
+
+      - name: Create protective FTP root marker only after domain match
+        shell: bash
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            get .massage-site-root.txt -o $RUNNER_TEMP/massage-existing-marker.txt;
+            bye
+          "; then
+            if [ "$(tr -d '\r\n' < "$RUNNER_TEMP/massage-existing-marker.txt")" != "massage.liniyasporta.ru" ]; then
+              echo "::error::Existing marker has unexpected content. Not overwriting."
+              exit 1
+            fi
+            echo "Correct protective marker already exists."
+          else
+            printf 'massage.liniyasporta.ru\n' > "$RUNNER_TEMP/massage-new-marker.txt"
+            lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+              set cmd:fail-exit true;
+              set ftp:ssl-force true;
+              set ftp:ssl-protect-data true;
+              set ftp:passive-mode true;
+              set ssl:verify-certificate true;
+              set net:max-retries 2;
+              set net:timeout 20;
+              cd /;
+              put $RUNNER_TEMP/massage-new-marker.txt -o .massage-site-root.txt;
+              bye
+            "
+            echo "Protective root marker created after live domain binding verification."
+          fi
+
+      - name: Report public DNS and HTTPS certificate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$TARGET_DOMAIN_IP" ]; then
+            echo "::warning::DNS is not yet configured. Add or correct an A record for massage.liniyasporta.ru."
+          fi
+          if curl -fsSIL --connect-timeout 8 --max-time 25             --resolve "massage.liniyasporta.ru:443:$SERVER_IP"             "https://massage.liniyasporta.ru/" >/dev/null; then
+            echo "HTTPS responds with a trusted certificate from the expected hosting server."
+          else
+            echo "::warning::HTTPS certificate or web response needs attention in ISPmanager."
+          fi
+
+      - name: Remove unique temporary verification file
+        if: always() && steps.upload_probe.outcome == 'success'
+        shell: bash
+        env:
+          MASSAGE_REG_PASSWORD: ${{ secrets.MASSAGE_REG_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PROBE_FILE:-}" ]; then exit 0; fi
+          lftp -u "u3652448_massage","$MASSAGE_REG_PASSWORD" "ftp://server169.hosting.reg.ru:21" -e "
+            set cmd:fail-exit true;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate true;
+            set net:max-retries 2;
+            set net:timeout 20;
+            cd /;
+            rm $PROBE_FILE;
+            bye
+          "
+          echo "Temporary verification file removed."
