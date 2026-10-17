@@ -39,3 +39,4 @@
   const selected = tabs.find(t => t.dataset.panelId === ref);
   if (location.hash.startsWith('#price-') && selected) activate(selected);
 })();
+
