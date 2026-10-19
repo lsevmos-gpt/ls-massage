@@ -63,22 +63,26 @@
         {
           "name": "Общий массаж",
           "regular_price_rub": 5000,
-          "gym_client_price_rub": 3500
+          "gym_client_price_rub": 3500,
+          "duration_minutes": 60
         },
         {
           "name": "Массаж ног",
           "regular_price_rub": 2500,
-          "gym_client_price_rub": 2000
+          "gym_client_price_rub": 2000,
+          "duration_minutes": 60
         },
         {
           "name": "Спина",
           "regular_price_rub": 2500,
-          "gym_client_price_rub": 2000
+          "gym_client_price_rub": 2000,
+          "duration_minutes": 60
         },
         {
           "name": "Антицеллюлитный",
           "regular_price_rub": 5000,
-          "gym_client_price_rub": 3500
+          "gym_client_price_rub": 3500,
+          "duration_minutes": 60
         }
       ],
       "appointment_address": "г. Симферополь, ул. 1-й Конной Армии, 25А, ТЦ «Олимпия»"
