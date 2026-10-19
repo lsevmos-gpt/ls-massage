@@ -21,7 +21,8 @@
       "address": "г. Симферополь, ул. 1-й Конной Армии, 25А",
       "url": "/clubs/1-konnoi-armii-25a/",
       "specialist_slugs": [
-        "ruslan"
+        "ruslan",
+        "olga"
       ],
       "location_hint": "ТЦ «Олимпия»"
     }
@@ -83,6 +84,97 @@
           "regular_price_rub": 5000,
           "gym_client_price_rub": 3500,
           "duration_minutes": 60
+        }
+      ],
+      "appointment_address": "г. Симферополь, ул. 1-й Конной Армии, 25А, ТЦ «Олимпия»"
+    },
+    {
+      "slug": "olga",
+      "name": "Ольга",
+      "club_id": "olympia",
+      "phone": "+79788269091",
+      "phone_display": "+7 978 826-90-91",
+      "url": "/specialists/olga/",
+      "photo": "/assets/olga-original-photo.jpg",
+      "role": "Специалист по аппаратным методикам в эстетической косметологии",
+      "experience": "LPG-мастер с 2017 года",
+      "user_supplied_client_count_claim": "1000+ довольных клиентов",
+      "focus": "Отёки, целлюлит, потерянный тонус после похудения",
+      "services": [
+        {
+          "name": "LPG + SKETCH",
+          "duration_minutes": 60,
+          "single": {
+            "regular_rub": 3500,
+            "club_rub": 3000
+          },
+          "first_visit": {
+            "regular_label": "Первый визит",
+            "regular_rub": 2900,
+            "club_label": "Пробный",
+            "club_rub": 2500
+          },
+          "courses": [
+            {
+              "package": "6 + 1 в подарок",
+              "regular_rub": 19500,
+              "regular_rub_per_session_text": "2 786 ₽",
+              "club_rub": 18000,
+              "club_rub_per_session_text": "2 571 ₽",
+              "featured": false,
+              "vip": false
+            },
+            {
+              "package": "10 + 2 в подарок",
+              "regular_rub": 31000,
+              "regular_rub_per_session_text": "2 583 ₽",
+              "club_rub": 28500,
+              "club_rub_per_session_text": "2 375 ₽",
+              "featured": true,
+              "vip": false
+            },
+            {
+              "package": "12 + 2 в подарок",
+              "regular_rub": 36000,
+              "regular_rub_per_session_text": "2 571 ₽",
+              "club_rub": 33000,
+              "club_rub_per_session_text": "2 357 ₽",
+              "featured": false,
+              "vip": false
+            },
+            {
+              "package": "18 + 3 в подарок",
+              "regular_rub": 50400,
+              "regular_rub_per_session_text": "2 400 ₽",
+              "club_rub": 46800,
+              "club_rub_per_session_text": "2 228 ₽",
+              "featured": false,
+              "vip": false
+            },
+            {
+              "package": "24 + 4 в подарок",
+              "regular_rub": 64800,
+              "regular_rub_per_session_text": "2 314 ₽",
+              "club_rub": 60000,
+              "club_rub_per_session_text": "2 143 ₽",
+              "featured": false,
+              "vip": true
+            }
+          ],
+          "conditions": {
+            "regular": [
+              "SKETCH без доплат",
+              "Костюм в подарок от 10",
+              "Замеры до / после",
+              "Заморозка 14 дней"
+            ],
+            "club": [
+              "SKETCH без доплат",
+              "Костюм в подарок от 6",
+              "Прокат костюма — бесплатно",
+              "Заморозка 14 дней"
+            ]
+          }
         }
       ],
       "appointment_address": "г. Симферополь, ул. 1-й Конной Армии, 25А, ТЦ «Олимпия»"

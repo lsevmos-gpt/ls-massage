@@ -82,6 +82,8 @@ jobs:
             site/specialists/grigory/index.html
             site/specialists/svetlana/index.html
             site/specialists/ruslan/index.html
+            site/specialists/olga/index.html
+            site/assets/olga-original-photo.jpg
             site/assets/ruslan-original-photo.jpg
             site/assets/LS_LOGO_VERTICAL_GREEN_WHITE_MASTER.png
             site/assets/LS_LOGO_HORIZONTAL_GREEN_WHITE_TRANSPARENT_MASTER.png
@@ -209,12 +211,12 @@ jobs:
             bye
           "
 
-      - name: Verify eight production routes over HTTPS
+      - name: Verify nine production routes over HTTPS
         if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') || inputs.mode == 'deploy'
         shell: bash
         run: |
           set -euo pipefail
-          for route in             /             /clubs/geroev-stalingrada/             /clubs/1-konnoi-armii-25a/             /clubs/olympia/             /specialists/anna/             /specialists/grigory/             /specialists/svetlana/             /specialists/ruslan/
+          for route in             /             /clubs/geroev-stalingrada/             /clubs/1-konnoi-armii-25a/             /clubs/olympia/             /specialists/anna/             /specialists/grigory/             /specialists/svetlana/             /specialists/ruslan/             /specialists/olga/
           do
             url="https://massage.liniyasporta.ru${route}?verify=${GITHUB_SHA}"
             curl --fail --location --silent --show-error               --retry 3 --retry-delay 5 --connect-timeout 10 --max-time 40               "$url" -o /tmp/massage-verified.html
@@ -230,4 +232,11 @@ jobs:
           grep -Fq '5 000 ₽' /tmp/massage-ruslan.html
           grep -Fq 'ДЛЯ КЛИЕНТОВ ЗАЛА' /tmp/massage-ruslan.html
           grep -Fq '+7 978 636-02-35' /tmp/massage-ruslan.html
-          echo "Eight HTTPS routes verified, including Ruslan profile and original club links."
+          curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/olga/?check=${GITHUB_SHA}" -o /tmp/massage-olga.html
+          grep -Fq 'LPG + SKETCH' /tmp/massage-olga.html
+          grep -Fq '+7 978 826-90-91' /tmp/massage-olga.html
+          grep -Fq '18 000 ₽' /tmp/massage-olga.html
+          grep -Fq '19 500 ₽' /tmp/massage-olga.html
+          grep -Fq '2 500 ₽' /tmp/massage-olga.html
+          grep -Fq 'Костюм в подарок' /tmp/massage-olga.html
+          echo "Nine HTTPS routes verified, including Olga course comparisons and contact."
