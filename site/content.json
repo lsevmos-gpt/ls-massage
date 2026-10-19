@@ -20,7 +20,9 @@
       "name": "Линия спорта — 1-й Конной Армии, 25А",
       "address": "г. Симферополь, ул. 1-й Конной Армии, 25А",
       "url": "/clubs/1-konnoi-armii-25a/",
-      "specialist_slugs": [],
+      "specialist_slugs": [
+        "ruslan"
+      ],
       "location_hint": "ТЦ «Олимпия»"
     }
   ],
@@ -48,6 +50,38 @@
       "working_days": [
         "воскресенье"
       ]
+    },
+    {
+      "slug": "ruslan",
+      "name": "Руслан",
+      "club_id": "olympia",
+      "phone": "+79786360235",
+      "phone_display": "+7 978 636-02-35",
+      "url": "/specialists/ruslan/",
+      "photo": "/assets/ruslan-original-photo.jpg",
+      "services": [
+        {
+          "name": "Общий массаж",
+          "regular_price_rub": 5000,
+          "gym_client_price_rub": 3500
+        },
+        {
+          "name": "Массаж ног",
+          "regular_price_rub": 2500,
+          "gym_client_price_rub": 2000
+        },
+        {
+          "name": "Спина",
+          "regular_price_rub": 2500,
+          "gym_client_price_rub": 2000
+        },
+        {
+          "name": "Антицеллюлитный",
+          "regular_price_rub": 5000,
+          "gym_client_price_rub": 3500
+        }
+      ],
+      "appointment_address": "г. Симферополь, ул. 1-й Конной Армии, 25А, ТЦ «Олимпия»"
     }
   ],
   "search_indexing": "noindex,nofollow"

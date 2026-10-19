@@ -81,6 +81,8 @@ jobs:
             site/specialists/anna/index.html
             site/specialists/grigory/index.html
             site/specialists/svetlana/index.html
+            site/specialists/ruslan/index.html
+            site/assets/ruslan-original-photo.jpg
             site/assets/LS_LOGO_VERTICAL_GREEN_WHITE_MASTER.png
             site/assets/LS_LOGO_HORIZONTAL_GREEN_WHITE_TRANSPARENT_MASTER.png
             site/assets/anna-original-portrait.png
@@ -207,12 +209,12 @@ jobs:
             bye
           "
 
-      - name: Verify seven production routes over HTTPS
+      - name: Verify eight production routes over HTTPS
         if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') || inputs.mode == 'deploy'
         shell: bash
         run: |
           set -euo pipefail
-          for route in             /             /clubs/geroev-stalingrada/             /clubs/1-konnoi-armii-25a/             /clubs/olympia/             /specialists/anna/             /specialists/grigory/             /specialists/svetlana/
+          for route in             /             /clubs/geroev-stalingrada/             /clubs/1-konnoi-armii-25a/             /clubs/olympia/             /specialists/anna/             /specialists/grigory/             /specialists/svetlana/             /specialists/ruslan/
           do
             url="https://massage.liniyasporta.ru${route}?verify=${GITHUB_SHA}"
             curl --fail --location --silent --show-error               --retry 3 --retry-delay 5 --connect-timeout 10 --max-time 40               "$url" -o /tmp/massage-verified.html
@@ -223,4 +225,9 @@ jobs:
           grep -Fq '1-й Конной Армии, 25А' /tmp/massage-new-club.html
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/clubs/olympia/?check=${GITHUB_SHA}" -o /tmp/massage-legacy-club.html
           grep -Fq '/clubs/1-konnoi-armii-25a/' /tmp/massage-legacy-club.html
-          echo "Seven HTTPS routes responded successfully, including new canonical route and old-link redirect."
+          curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/ruslan/?check=${GITHUB_SHA}" -o /tmp/massage-ruslan.html
+          grep -Fq 'РУСЛАН' /tmp/massage-ruslan.html
+          grep -Fq '5 000 ₽' /tmp/massage-ruslan.html
+          grep -Fq 'ДЛЯ КЛИЕНТОВ ЗАЛА' /tmp/massage-ruslan.html
+          grep -Fq '+7 978 636-02-35' /tmp/massage-ruslan.html
+          echo "Eight HTTPS routes verified, including Ruslan profile and original club links."
