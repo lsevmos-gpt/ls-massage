@@ -175,10 +175,76 @@
               "Заморозка 14 дней"
             ]
           }
+        },
+        {
+          "name": "LPG лица — «Лицо PREMIUM»",
+          "duration_minutes": 40,
+          "areas": [
+            "лицо",
+            "шея",
+            "декольте"
+          ],
+          "gift": "уходовая маска",
+          "single": {
+            "regular_rub": 1900,
+            "club_rub": 1600
+          },
+          "diagnostic_for_new": {
+            "regular_rub": 1400,
+            "club_rub": null
+          },
+          "courses": [
+            {
+              "paid_sessions": 8,
+              "gift_sessions": 0,
+              "regular_rub": 14400,
+              "club_rub": 12800,
+              "regular_per_paid_session_rub": 1800,
+              "club_per_paid_session_rub": 1600
+            },
+            {
+              "paid_sessions": 12,
+              "gift_sessions": 1,
+              "recommended": true,
+              "regular_rub": 20400,
+              "club_rub": 17400,
+              "regular_per_paid_session_rub": 1700,
+              "club_per_paid_session_rub": 1450
+            },
+            {
+              "paid_sessions": 24,
+              "gift_sessions": 2,
+              "price_for_year": true,
+              "regular_rub": 38400,
+              "club_rub": 33600,
+              "regular_per_paid_session_rub": 1600,
+              "club_per_paid_session_rub": 1400
+            }
+          ],
+          "course_notes": {
+            "min_paid_sessions": 8,
+            "recommended_paid_sessions": 12,
+            "frequency": "2–3 раза в неделю",
+            "validity": {
+              "8": "6 недель",
+              "12": "2 месяца",
+              "24": "5 месяцев"
+            }
+          },
+          "member_benefits": [
+            "приоритетная запись",
+            "LPG тела в подарок при курсе от 12 сеансов",
+            "«Приведи подругу»: подруге 1400 ₽, члену клуба +1 сеанс",
+            "фото-контроль до / после"
+          ]
         }
       ],
       "appointment_address": "г. Симферополь, ул. 1-й Конной Армии, 25А, ТЦ «Олимпия»"
     }
   ],
-  "search_indexing": "noindex,nofollow"
+  "search_indexing": "noindex,nofollow",
+  "pricing_labels": {
+    "regular": "Без клубной карты",
+    "member": "Для членов клуба"
+  }
 }

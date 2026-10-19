@@ -225,12 +225,27 @@ jobs:
           done
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/clubs/1-konnoi-armii-25a/?check=${GITHUB_SHA}" -o /tmp/massage-new-club.html
           grep -Fq '1-й Конной Армии, 25А' /tmp/massage-new-club.html
+          grep -Fq 'class="team section club-page-team club-page-team--two"' /tmp/massage-new-club.html
+          grep -Fq 'class="club-page-contact section" id="club-contact"' /tmp/massage-new-club.html
+          grep -Fq 'ВЫБЕРИТЕ<br><em>СПЕЦИАЛИСТА.' /tmp/massage-new-club.html
+          grep -Fq 'href="tel:+79786360235"' /tmp/massage-new-club.html
+          grep -Fq 'href="tel:+79788269091"' /tmp/massage-new-club.html
+          grep -Fq 'href="/specialists/ruslan/"' /tmp/massage-new-club.html
+          grep -Fq 'href="/specialists/olga/"' /tmp/massage-new-club.html
+          if grep -Eiq '(Героев Сталинграда|Григорий|Светлана Щетинина|>Анна<|club-landing-hero)' /tmp/massage-new-club.html; then
+            echo "::error::Second club page has foreign specialists or an old layout."
+            exit 1
+          fi
+          curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/clubs/geroev-stalingrada/?check=${GITHUB_SHA}" -o /tmp/massage-first-club.html
+          grep -Fq 'class="club-page-contact section" id="club-contact"' /tmp/massage-first-club.html
+          grep -Fq 'class="team section club-page-team"' /tmp/massage-first-club.html
+          echo "Both club pages use the same specialist-card and contact-section structure."
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/clubs/olympia/?check=${GITHUB_SHA}" -o /tmp/massage-legacy-club.html
           grep -Fq '/clubs/1-konnoi-armii-25a/' /tmp/massage-legacy-club.html
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/ruslan/?check=${GITHUB_SHA}" -o /tmp/massage-ruslan.html
           grep -Fq 'РУСЛАН' /tmp/massage-ruslan.html
           grep -Fq '5 000 ₽' /tmp/massage-ruslan.html
-          grep -Fq 'ДЛЯ КЛИЕНТОВ ЗАЛА' /tmp/massage-ruslan.html
+          grep -Fq 'ДЛЯ ЧЛЕНОВ КЛУБА' /tmp/massage-ruslan.html
           grep -Fq '+7 978 636-02-35' /tmp/massage-ruslan.html
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/olga/?check=${GITHUB_SHA}" -o /tmp/massage-olga.html
           grep -Fq 'LPG + SKETCH' /tmp/massage-olga.html
@@ -239,4 +254,15 @@ jobs:
           grep -Fq '19 500 ₽' /tmp/massage-olga.html
           grep -Fq '2 500 ₽' /tmp/massage-olga.html
           grep -Fq 'Костюм в подарок' /tmp/massage-olga.html
+          grep -Fq 'Лицо PREMIUM' /tmp/massage-olga.html
+          grep -Fq '1 900 ₽' /tmp/massage-olga.html
+          grep -Fq '1 600 ₽' /tmp/massage-olga.html
+          grep -Fq '20 400 ₽' /tmp/massage-olga.html
+          grep -Fq '17 400 ₽' /tmp/massage-olga.html
+          for specialist in anna grigory svetlana ruslan olga; do
+            curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/${specialist}/?labels=${GITHUB_SHA}" -o /tmp/massage-specialist-labels.html
+            grep -Fq '<small>БЕЗ КЛУБНОЙ КАРТЫ</small>' /tmp/massage-specialist-labels.html
+            grep -Fq '<small>ДЛЯ ЧЛЕНОВ КЛУБА</small>' /tmp/massage-specialist-labels.html
+          done
+          echo "All specialist pages and both Olga price sections have standardized membership labels."
           echo "Nine HTTPS routes verified, including Olga course comparisons and contact."

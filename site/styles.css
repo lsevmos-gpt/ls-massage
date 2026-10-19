@@ -196,3 +196,7 @@ h1,h2,h3,p{margin-top:0}.overline{display:flex;gap:12px;align-items:center;font-
 /* Club 6D: the team is the first section; no redundant location hero. */
 .club-page-team{padding-top:34px}
 @media(max-width:680px){.club-page-team{padding-top:25px}}
+
+/* Unified price headings for all five therapists; allow graceful mobile wraps. */
+.rate-values .cost small{white-space:normal;line-height:1.35;overflow-wrap:normal}
+@media(max-width:680px){.rate-values .cost small{min-height:2.65em}}
