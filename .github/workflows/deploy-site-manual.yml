@@ -76,6 +76,7 @@ jobs:
             site/app.js
             site/content.json
             site/clubs/geroev-stalingrada/index.html
+            site/clubs/1-konnoi-armii-25a/index.html
             site/clubs/olympia/index.html
             site/specialists/anna/index.html
             site/specialists/grigory/index.html
@@ -206,16 +207,20 @@ jobs:
             bye
           "
 
-      - name: Verify six production pages over HTTPS
+      - name: Verify seven production routes over HTTPS
         if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-massage]') || inputs.mode == 'deploy'
         shell: bash
         run: |
           set -euo pipefail
-          for route in             /             /clubs/geroev-stalingrada/             /clubs/olympia/             /specialists/anna/             /specialists/grigory/             /specialists/svetlana/
+          for route in             /             /clubs/geroev-stalingrada/             /clubs/1-konnoi-armii-25a/             /clubs/olympia/             /specialists/anna/             /specialists/grigory/             /specialists/svetlana/
           do
             url="https://massage.liniyasporta.ru${route}?verify=${GITHUB_SHA}"
             curl --fail --location --silent --show-error               --retry 3 --retry-delay 5 --connect-timeout 10 --max-time 40               "$url" -o /tmp/massage-verified.html
             grep -Eqi 'Линия спорта|ЛИНИЯ СПОРТА|Массаж' /tmp/massage-verified.html
             echo "Verified $route"
           done
-          echo "Six HTTPS pages responded successfully."
+          curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/clubs/1-konnoi-armii-25a/?check=${GITHUB_SHA}" -o /tmp/massage-new-club.html
+          grep -Fq '1-й Конной Армии, 25А' /tmp/massage-new-club.html
+          curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/clubs/olympia/?check=${GITHUB_SHA}" -o /tmp/massage-legacy-club.html
+          grep -Fq '/clubs/1-konnoi-armii-25a/' /tmp/massage-legacy-club.html
+          echo "Seven HTTPS routes responded successfully, including new canonical route and old-link redirect."

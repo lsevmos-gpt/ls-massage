@@ -17,10 +17,11 @@
     },
     {
       "id": "olympia",
-      "name": "Линия спорта — ТЦ «Олимпия»",
+      "name": "Линия спорта — 1-й Конной Армии, 25А",
       "address": "г. Симферополь, ул. 1-й Конной Армии, 25А",
-      "url": "/clubs/olympia/",
-      "specialist_slugs": []
+      "url": "/clubs/1-konnoi-armii-25a/",
+      "specialist_slugs": [],
+      "location_hint": "ТЦ «Олимпия»"
     }
   ],
   "team": [
