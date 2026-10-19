@@ -246,6 +246,10 @@ jobs:
           grep -Fq 'РУСЛАН' /tmp/massage-ruslan.html
           grep -Fq '5 000 ₽' /tmp/massage-ruslan.html
           grep -Fq 'ДЛЯ ЧЛЕНОВ КЛУБА' /tmp/massage-ruslan.html
+          grep -Fq '<strong>Общий массаж</strong><span>60 мин</span>' /tmp/massage-ruslan.html
+          grep -Fq '<strong>Массаж ног</strong><span>30 мин</span>' /tmp/massage-ruslan.html
+          grep -Fq '<strong>Спина</strong><span>30 мин</span>' /tmp/massage-ruslan.html
+          grep -Fq '<strong>Антицеллюлитный</strong><span>60 мин</span>' /tmp/massage-ruslan.html
           grep -Fq '+7 978 636-02-35' /tmp/massage-ruslan.html
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/olga/?check=${GITHUB_SHA}" -o /tmp/massage-olga.html
           grep -Fq 'LPG + SKETCH' /tmp/massage-olga.html
