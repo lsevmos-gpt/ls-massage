@@ -80,10 +80,11 @@
           "duration_minutes": 30
         },
         {
-          "name": "Антицеллюлитный",
-          "regular_price_rub": 5000,
-          "gym_client_price_rub": 3500,
-          "duration_minutes": 60
+          "name": "Лечебный (миофасциальный)",
+          "regular_price_rub": 4000,
+          "gym_client_price_rub": 3000,
+          "duration_min_minutes": 30,
+          "duration_max_minutes": 60
         }
       ],
       "appointment_address": "г. Симферополь, ул. 1-й Конной Армии, 25А, ТЦ «Олимпия»"
