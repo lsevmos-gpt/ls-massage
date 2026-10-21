@@ -240,6 +240,27 @@ jobs:
           grep -Fq 'class="club-page-contact section" id="club-contact"' /tmp/massage-first-club.html
           grep -Fq 'class="team section club-page-team"' /tmp/massage-first-club.html
           echo "Both club pages use the same specialist-card and contact-section structure."
+          # Confirm the actually published pages display Svetlana by first name only.
+          for route in /specialists/svetlana/ /clubs/geroev-stalingrada/ /specialists/anna/ /specialists/grigory/; do
+            curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru${route}?svetlana-name-check=${GITHUB_SHA}" -o /tmp/massage-name-check.html
+            if grep -Eiq 'Щетинин' /tmp/massage-name-check.html; then
+              echo "::error::Old surname is still visible on published page: ${route}"
+              exit 1
+            fi
+            if ! grep -Fq '>Светлана<' /tmp/massage-name-check.html && ! grep -Fq '>СВЕТЛАНА<i>' /tmp/massage-name-check.html; then
+              echo "::error::Svetlana's first name was not found on published page: ${route}"
+              exit 1
+            fi
+            echo "Confirmed Svetlana without surname: ${route}"
+          done
+          curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/content.json?svetlana-name-check=${GITHUB_SHA}" -o /tmp/massage-live-data.json
+          grep -Fq '"name": "Светлана"' /tmp/massage-live-data.json
+          if grep -Eiq 'Щетинин' /tmp/massage-live-data.json; then
+            echo "::error::Old Svetlana surname remains in published site data."
+            exit 1
+          fi
+          echo "Published site data also uses only Svetlana."
+
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/clubs/olympia/?check=${GITHUB_SHA}" -o /tmp/massage-legacy-club.html
           grep -Fq '/clubs/1-konnoi-armii-25a/' /tmp/massage-legacy-club.html
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/ruslan/?check=${GITHUB_SHA}" -o /tmp/massage-ruslan.html
@@ -249,7 +270,9 @@ jobs:
           grep -Fq '<strong>Общий массаж</strong><span>60 мин</span>' /tmp/massage-ruslan.html
           grep -Fq '<strong>Массаж ног</strong><span>30 мин</span>' /tmp/massage-ruslan.html
           grep -Fq '<strong>Спина</strong><span>30 мин</span>' /tmp/massage-ruslan.html
-          grep -Fq '<strong>Антицеллюлитный</strong><span>60 мин</span>' /tmp/massage-ruslan.html
+          grep -Fq '<strong>Лечебный (миофасциальный)</strong><span>30–60 мин</span>' /tmp/massage-ruslan.html
+          grep -Fq '4 000 ₽' /tmp/massage-ruslan.html
+          grep -Fq '3 000 ₽' /tmp/massage-ruslan.html
           grep -Fq '+7 978 636-02-35' /tmp/massage-ruslan.html
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/olga/?check=${GITHUB_SHA}" -o /tmp/massage-olga.html
           grep -Fq 'LPG + SKETCH' /tmp/massage-olga.html
