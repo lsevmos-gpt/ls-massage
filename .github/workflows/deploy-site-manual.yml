@@ -265,6 +265,8 @@ jobs:
           grep -Fq '/clubs/1-konnoi-armii-25a/' /tmp/massage-legacy-club.html
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/ruslan/?check=${GITHUB_SHA}" -o /tmp/massage-ruslan.html
           grep -Fq 'РУСЛАН' /tmp/massage-ruslan.html
+          grep -Fq '<section class="profile-schedule" aria-labelledby="ruslan-schedule-title">' /tmp/massage-ruslan.html
+          grep -Fq '<p>Вторник · Четверг · Суббота</p>' /tmp/massage-ruslan.html
           grep -Fq '5 000 ₽' /tmp/massage-ruslan.html
           grep -Fq 'ДЛЯ ЧЛЕНОВ КЛУБА' /tmp/massage-ruslan.html
           grep -Fq '<strong>Общий массаж</strong><span>60 мин</span>' /tmp/massage-ruslan.html
@@ -276,6 +278,8 @@ jobs:
           grep -Fq '+7 978 636-02-35' /tmp/massage-ruslan.html
           curl --fail --location --silent --show-error --connect-timeout 10 --max-time 40 "https://massage.liniyasporta.ru/specialists/olga/?check=${GITHUB_SHA}" -o /tmp/massage-olga.html
           grep -Fq 'LPG + SKETCH' /tmp/massage-olga.html
+          grep -Fq '<section class="profile-schedule" aria-labelledby="olga-schedule-title">' /tmp/massage-olga.html
+          grep -Fq '<p>Понедельник · Среда · Пятница</p>' /tmp/massage-olga.html
           grep -Fq '+7 978 826-90-91' /tmp/massage-olga.html
           grep -Fq '18 000 ₽' /tmp/massage-olga.html
           grep -Fq '19 500 ₽' /tmp/massage-olga.html
@@ -292,4 +296,19 @@ jobs:
             grep -Fq '<small>ДЛЯ ЧЛЕНОВ КЛУБА</small>' /tmp/massage-specialist-labels.html
           done
           echo "All specialist pages and both Olga price sections have standardized membership labels."
+          python3 - <<'PY'
+          import json
+          with open('/tmp/massage-live-data.json', encoding='utf-8') as stream:
+              team = json.load(stream)['team']
+          lookup = {person['slug']: person for person in team}
+          expected = {
+              'ruslan': ['вторник', 'четверг', 'суббота'],
+              'olga': ['понедельник', 'среда', 'пятница'],
+          }
+          for slug, days in expected.items():
+              if lookup[slug].get('working_days') != days:
+                  raise SystemExit(f'Incorrect live schedule data: {slug}')
+          print('Published Ruslan and Olga working days verified.')
+          PY
+
           echo "Nine HTTPS routes verified, including Olga course comparisons and contact."
