@@ -3,3 +3,4 @@ FTP credentials: configured in GitHub Actions secret.
 Prerequisites: domain binding verified, six site pages and image assets imported, read-only plan passed.
 No delete remote files. Back up public web files before upload.
 2026-10-21: Deploy corrected first-name-only Svetlana pages; verify live pages, Ruslan tariff and source data.
+2026-10-21: Publish Ruslan (Tue/Thu/Sat) and Olga (Mon/Wed/Fri) schedules; verify two profile pages and live data.
