@@ -21,6 +21,27 @@
 <style>
 /* Only Anna: keep the original, unmodified square photograph and frame her face prominently. */
 .profile-image--anna > img { object-fit:cover; object-position:center top; transform:scale(1.12); transform-origin:center top; }
+
+/* Anna: a high-contrast, immediately visible schedule in the profile hero. */
+.anna-schedule{max-width:510px;margin:0 0 24px;padding:21px 22px 22px;background:linear-gradient(135deg,#07140f,#143020);color:#fff;border:1px solid #274932;border-left:5px solid var(--lime);border-radius:9px;box-shadow:0 13px 34px rgba(5,28,14,.13)}
+.anna-schedule-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:17px}
+.anna-schedule-heading h2{margin:0;color:#fff;font-size:19px;font-weight:900;letter-spacing:.025em;line-height:1.15}
+.anna-schedule-heading span{color:#a7eab7;font-size:10px;font-weight:800;white-space:nowrap;letter-spacing:.07em;text-transform:uppercase}
+.anna-schedule-days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.anna-schedule-day{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-width:0;padding:13px 4px 12px;border-radius:5px;background:#1b4029;border:1px solid #326746;text-align:center}
+.anna-schedule-day strong{color:#72df8b;font-size:31px;font-weight:900;line-height:1;letter-spacing:-.045em}
+.anna-schedule-day span{color:#fff;font-size:12px;font-weight:750;line-height:1.2}
+@media(max-width:680px){
+ .anna-schedule{padding:18px 14px 16px;margin-bottom:22px}
+ .anna-schedule-heading{margin-bottom:14px}
+ .anna-schedule-heading h2{font-size:17px}
+ .anna-schedule-heading span{font-size:9px}
+ .anna-schedule-days{gap:6px}
+ .anna-schedule-day{padding:13px 2px 12px;gap:6px}
+ .anna-schedule-day strong{font-size:28px}
+ .anna-schedule-day span{font-size:clamp(9px,2.75vw,12px)}
+}
+@media(max-width:370px){.anna-schedule-heading span{display:none}}
 </style>
 <script defer="" src="/app.js?v=11.0"></script>
 </head><body>
@@ -32,9 +53,15 @@
 <button aria-controls="mobile-nav" aria-expanded="false" aria-label="Открыть меню" class="menu-toggle" type="button"><span></span><span></span><span></span></button>
 </div><nav aria-label="Мобильная навигация" class="mobile-nav" hidden id="mobile-nav"><a href="/clubs/geroev-stalingrada/">О клубе</a><a href="/clubs/geroev-stalingrada/#club-team">Все массажисты клуба</a><a href="#prices-person">Прайс</a></nav></header><main id="content"><div class="shell breadcrumbs"><a href="/clubs/geroev-stalingrada/">Героев Сталинграда, 6Д</a><span> / </span><strong>Анна</strong></div>
 <section class="profile-section"><div class="shell profile-grid"><div class="profile-copy"><p class="overline"><span></span> МАССАЖИСТ / КЛУБ 01 / ГЕРОЕВ СТАЛИНГРАДА</p>
-<h1>АННА<i>.</i></h1><p class="profile-lead">Забота о теле в каждом движении. Профессиональный массаж для восстановления и гармонии.</p><p class="profile-bio">Индивидуальный подход к целям и особенностям тела — от расслабления до восстановления после тренировок.</p>
+<h1>АННА<i>.</i></h1><section class="anna-schedule" aria-labelledby="anna-schedule-title">
+<div class="anna-schedule-heading"><h2 id="anna-schedule-title">ДНИ ПРИЁМА</h2><span>3 дня в неделю</span></div>
+<div class="anna-schedule-days">
+<div class="anna-schedule-day"><strong>ПН</strong><span>Понедельник</span></div>
+<div class="anna-schedule-day"><strong>СР</strong><span>Среда</span></div>
+<div class="anna-schedule-day"><strong>ПТ</strong><span>Пятница</span></div>
+</div></section><p class="profile-lead">Забота о теле в каждом движении. Профессиональный массаж для восстановления и гармонии.</p><p class="profile-bio">Индивидуальный подход к целям и особенностям тела — от расслабления до восстановления после тренировок.</p>
 <div class="profile-details"><span>МАССАЖ И ВОССТАНОВЛЕНИЕ</span><span class="profile-club-tag">КЛУБ / ГЕРОЕВ СТАЛИНГРАДА, 6Д</span></div>
-<div class="profile-club-place"><span>МЕСТО ПРИЁМА</span><strong>г. Симферополь, ул. Героев Сталинграда, 6Д</strong><a href="/clubs/geroev-stalingrada/">Страница клуба ↗</a></div><p class="profile-bio"><strong>Дни приёма:</strong> понедельник, среда, пятница.</p><div class="profile-actions"><a class="btn btn-primary" href="tel:+79781309114">Записаться <svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4.75 12h14.5m-6-6 6 6-6 6"></path></svg></a><a class="secondary-link" href="#prices-person">Услуги и цены ↓</a></div>
+<div class="profile-club-place"><span>МЕСТО ПРИЁМА</span><strong>г. Симферополь, ул. Героев Сталинграда, 6Д</strong><a href="/clubs/geroev-stalingrada/">Страница клуба ↗</a></div><div class="profile-actions"><a class="btn btn-primary" href="tel:+79781309114">Записаться <svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4.75 12h14.5m-6-6 6 6-6 6"></path></svg></a><a class="secondary-link" href="#prices-person">Услуги и цены ↓</a></div>
 <div class="profile-contact-phone">+7 978 130 91 14</div>
 </div><div class="profile-image profile-image--anna"><img alt="Портрет массажиста Анна" fetchpriority="high" width="1254" height="1254" src="/assets/anna-original-square.png"/><div class="profile-image-note"><span>ЛИНИЯ СПОРТА</span><span>МАССАЖ / 01</span></div></div></div></section>
 <section class="profile-specialties section"><div class="shell"><div class="section-head"><div><p class="overline"><span></span> НАПРАВЛЕНИЯ РАБОТЫ</p><h2>ЧЕМ МОЖЕТ<br/><em>ПОМОЧЬ МАССАЖ.</em></h2></div><p>Подходящие процедуры, продолжительность и противопоказания уточните у специалиста перед записью.</p></div><div class="specialty-grid"><div class="specialty"><span>01</span><strong>Снятие напряжения</strong></div><div class="specialty"><span>02</span><strong>Восстановление после тренировок</strong></div><div class="specialty"><span>03</span><strong>Коррекция фигуры / аппаратный массаж</strong></div></div></div></section>
