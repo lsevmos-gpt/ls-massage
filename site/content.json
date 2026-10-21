@@ -33,7 +33,12 @@
       "name": "Анна",
       "club_id": "geroev-stalingrada",
       "phone": "+79781309114",
-      "url": "/specialists/anna/"
+      "url": "/specialists/anna/",
+      "working_days": [
+        "понедельник",
+        "среда",
+        "пятница"
+      ]
     },
     {
       "slug": "grigory",
