@@ -45,7 +45,12 @@
       "name": "Григорий",
       "club_id": "geroev-stalingrada",
       "phone": "+79787732353",
-      "url": "/specialists/grigory/"
+      "url": "/specialists/grigory/",
+      "working_days": [
+        "вторник",
+        "четверг",
+        "суббота"
+      ]
     },
     {
       "slug": "svetlana",
