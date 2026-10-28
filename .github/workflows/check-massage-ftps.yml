@@ -2,6 +2,11 @@ name: Check massage FTPS (read-only)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/check-massage-ftps.yml'
 
 permissions:
   contents: read
@@ -78,3 +83,5 @@ jobs:
           else
             echo "::notice::FTP works, but the root marker is missing. Create .massage-site-root.txt in the site webroot before plan/deploy."
           fi
+
+# Read-only connection recheck (2026-10-28); no remote writes.
